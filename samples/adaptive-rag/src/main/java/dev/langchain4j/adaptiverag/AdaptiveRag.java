@@ -257,39 +257,45 @@ public class AdaptiveRag {
         return "not supported";
     }
 
+    /**
+     * 构建自适应RAG系统的工作流程图
+     * 
+     * @return 配置好的状态图实例
+     * @throws Exception 如果在构建过程中发生错误
+     */
     public StateGraph<State> buildGraph() throws Exception {
         return new StateGraph<>(State::new)
-            // Define the nodes
-            .addNode("web_search", node_async(this::webSearch) )  // web search
-            .addNode("retrieve", node_async(this::retrieve) )  // retrieve
-            .addNode("grade_documents",  node_async(this::gradeDocuments) )  // grade documents
-            .addNode("generate", node_async(this::generate) )  // generatae
-            .addNode("transform_query", node_async(this::transformQuery))  // transform_query
-            // Build graph
+            // 定义节点
+            .addNode("web_search", node_async(this::webSearch) )  // 网络搜索
+            .addNode("retrieve", node_async(this::retrieve) )  // 检索
+            .addNode("grade_documents",  node_async(this::gradeDocuments) )  // 文档评分
+            .addNode("generate", node_async(this::generate) )  // 生成
+            .addNode("transform_query", node_async(this::transformQuery))  // 查询转换
+            // 构建图
             .addConditionalEdges(START,
                     edge_async(this::routeQuestion),
                     mapOf(
-                        "web_search", "web_search",
-                        "vectorstore", "retrieve"
+                        "web_search", "web_search",        // 使用网络搜索路径
+                        "vectorstore", "retrieve"          // 使用向量存储路径
                     ))
 
-            .addEdge("web_search", "generate")
-            .addEdge("retrieve", "grade_documents")
+            .addEdge("web_search", "generate")            // 网络搜索到生成的边
+            .addEdge("retrieve", "grade_documents")       // 检索到文档评分的边
             .addConditionalEdges(
                     "grade_documents",
                     edge_async(this::decideToGenerate),
                     mapOf(
-                        "transform_query","transform_query",
-                        "generate", "generate"
+                        "transform_query","transform_query", // 需要优化查询
+                        "generate", "generate"               // 可以直接生成答案
                     ))
-            .addEdge("transform_query", "retrieve")
+            .addEdge("transform_query", "retrieve")       // 查询优化到重新检索的边
             .addConditionalEdges(
                     "generate",
                     edge_async(this::gradeGeneration_v_documentsAndQuestion),
                     mapOf(
-                            "not supported", "generate",
-                            "useful", END,
-                            "not useful", "transform_query"
+                            "not supported", "generate",      // 不支持时重新生成
+                            "useful", END,                    // 生成结果有用时结束
+                            "not useful", "transform_query"   // 生成结果无用时优化查询
                     ))
              ;
     }
@@ -323,4 +329,3 @@ public class AdaptiveRag {
     }
 
 }
-

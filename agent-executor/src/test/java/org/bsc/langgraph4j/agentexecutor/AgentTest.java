@@ -27,6 +27,7 @@ public class AgentTest {
 
         var chatLanguageModel = OpenAiChatModel.builder()
                 .apiKey( DotEnvConfig.valueOf("OPENAI_API_KEY").get() )
+                .baseUrl( DotEnvConfig.valueOf("OPENAI_API_URL").orElse("https://api.openai.com/v1"))
                 .modelName( "gpt-4o-mini" )
                 .logResponses(true)
                 .maxRetries(2)

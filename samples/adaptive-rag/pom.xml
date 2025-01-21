@@ -5,7 +5,7 @@
         <groupId>org.bsc.langgraph4j</groupId>
         <artifactId>langgraph4j-parent</artifactId>
         <version>1.2.3</version>
-        <relativePath>../..</relativePath>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <artifactId>langgraph4j-adaptive-rag</artifactId>
