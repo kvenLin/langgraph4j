@@ -8,8 +8,6 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * 使用 GPT4-Vision 分析页面截图并识别操作步骤
@@ -61,40 +59,6 @@ public class VisionAnalyzer {
         }
     }
 
-    /**
-     * 分析页面截图并提取操作步骤
-     * @param screenshotPath 截图路径
-     * @param operation 操作指令
-     * @return 操作步骤列表
-     */
-    public List<OperationStep> analyzeScreenshotForOperation(Path screenshotPath, String operation) {
-        try {
-            String prompt = String.format("""
-                请分析这个网页截图，找出如何执行以下操作：
-                %s
-                
-                注意：
-                1. 找出操作涉及的目标元素
-                2. 确定元素的精确位置（使用标记的坐标）
-                3. 验证元素当前是否可交互
-                4. 如果找不到目标元素，给出详细的原因
-                
-                请以JSON格式返回结果，包含以下字段：
-                - type: 操作类型（click/input/verify）
-                - target: 目标元素的选择器或坐标
-                - value: 操作值（如输入文本、验证内容）
-                """, operation);
-
-            String response = visionClient.analyzeImage(prompt, screenshotPath);
-            log.info("操作分析结果: {}", response);
-            return objectMapper.readValue(response,
-                objectMapper.getTypeFactory().constructCollectionType(List.class, OperationStep.class));
-
-        } catch (Exception e) {
-            log.error("操作分析失败: {}", e.getMessage(), e);
-            throw new RuntimeException("操作分析失败", e);
-        }
-    }
 
     /**
      * 从 markdown 中提取 JSON
@@ -115,6 +79,9 @@ public class VisionAnalyzer {
         return response;
     }
 
+
+
+
     /**
      * 分析截图并生成操作步骤
      */
@@ -125,12 +92,12 @@ public class VisionAnalyzer {
 
             // 调用 GPT4-Vision 分析图片
             log.info("开始分析截图：{}", screenshotPath);
-//            String response = visionClient.analyzeImage(prompt, screenshotPath);
-            String response = """
-                    ```json
-                    {"steps":[{"index":"0","action":"click","value":"","description":"点击进入新闻板块"},{"index":"1","action":"click","value":"","description":"点击进入hao123导航"},{"index":"2","action":"click","value":"","description":"点击进入地图功能"},{"index":"3","action":"click","value":"","description":"点击进入贴吧社区"},{"index":"4","action":"click","value":"","description":"点击进入视频板块"},{"index":"5","action":"click","value":"","description":"点击进入图片板块"},{"index":"6","action":"click","value":"","description":"点击进入网盘功能"},{"index":"7","action":"click","value":"","description":"点击进入更多应用"},{"index":"9","action":"click","value":"","description":"点击进入文学频道"},{"index":"11","action":"click","value":"","description":"点击设置选项"},{"index":"12","action":"click","value":"","description":"点击登录进行身份验证"},{"index":"13","action":"input","value":"搜索关键词","description":"在搜索框中输入您想搜索的内容"},{"index":"14","action":"click","value":"","description":"点击“百度一下”按钮执行搜索"},{"index":"17","action":"click","value":"","description":"点击体验百度AI搜索"},{"index":"29","action":"click","value":"","description":"点击换一换以查看更多新闻内容"},{"index":"32","action":"click","value":"","description":"点击查看关于习近平举行视频会晤的新闻"},{"index":"37","action":"click","value":"","description":"点击查看关于解除对美新任商务卿制裁的新闻"},{"index":"44","action":"click","value":"","description":"点击查看关于国泰航空的新闻"},{"index":"50","action":"click","value":"","description":"点击查看关于商品假日消费的新闻"},{"index":"61","action":"click","value":"","description":"点击进入关于K歌的板块"}]}
-                    ```
-                    """;
+            String response = visionClient.analyzeImage(prompt, screenshotPath);
+//            String response = """
+//                    ```json
+//                    {"steps":[{"index":"0","action":"click","value":"","description":"点击进入新闻板块"},{"index":"1","action":"click","value":"","description":"点击进入hao123导航"},{"index":"2","action":"click","value":"","description":"点击进入地图功能"},{"index":"3","action":"click","value":"","description":"点击进入贴吧社区"},{"index":"4","action":"click","value":"","description":"点击进入视频板块"},{"index":"5","action":"click","value":"","description":"点击进入图片板块"},{"index":"6","action":"click","value":"","description":"点击进入网盘功能"},{"index":"7","action":"click","value":"","description":"点击进入更多应用"},{"index":"9","action":"click","value":"","description":"点击进入文学频道"},{"index":"11","action":"click","value":"","description":"点击设置选项"},{"index":"12","action":"click","value":"","description":"点击登录进行身份验证"},{"index":"13","action":"input","value":"搜索关键词","description":"在搜索框中输入您想搜索的内容"},{"index":"14","action":"click","value":"","description":"点击“百度一下”按钮执行搜索"},{"index":"17","action":"click","value":"","description":"点击体验百度AI搜索"},{"index":"29","action":"click","value":"","description":"点击换一换以查看更多新闻内容"},{"index":"32","action":"click","value":"","description":"点击查看关于习近平举行视频会晤的新闻"},{"index":"37","action":"click","value":"","description":"点击查看关于解除对美新任商务卿制裁的新闻"},{"index":"44","action":"click","value":"","description":"点击查看关于国泰航空的新闻"},{"index":"50","action":"click","value":"","description":"点击查看关于商品假日消费的新闻"},{"index":"61","action":"click","value":"","description":"点击进入关于K歌的板块"}]}
+//                    ```
+//                    """;
             log.info("GPT4-Vision 返回结果：{}", response);
 
             // 从 markdown 中提取 JSON

@@ -30,6 +30,12 @@
     </dependency>
 
     <dependency>
+      <groupId>cn.hutool</groupId>
+      <artifactId>hutool-all</artifactId>
+      <version>5.8.35</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.bsc.async</groupId>
       <artifactId>async-generator-jdk8</artifactId>
       <version>2.3.0</version>

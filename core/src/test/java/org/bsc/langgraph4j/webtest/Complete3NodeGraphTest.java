@@ -68,22 +68,18 @@ public class Complete3NodeGraphTest {
             // 构建状态图
             var graph = new StateGraph<>(WebTestState.SCHEMA, WebTestState::new)
                     // 定义节点
-                    .addNode("analyze", executor::analyzeInput)
                     .addNode("parse", executor::parsePage)
-                    .addNode("extract", executor::extractStep)
                     .addNode("execute", executor::execute)
                     // 构建图
-                    .addEdge(START, "analyze")
-                    .addEdge("analyze", "parse")
-                    .addEdge("parse", "extract")
-                    .addEdge("extract", "execute")
+                    .addEdge(START, "parse")
+                    .addEdge("parse", "execute")
                     .addConditionalEdges("execute",
                             edge_async(state -> String.valueOf(state.success()
                                     .map(success -> !success && executor.counter.get() < 3)
                                     .orElse(false))),
                             mapOf(
-                                    "true", "parse",
-                                    "false", END
+                                    "false", "parse",
+                                    "true", END
                             )
                     );
             log.info("状态图构建完成");

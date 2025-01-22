@@ -4,6 +4,7 @@ import org.bsc.langgraph4j.state.AgentState;
 import org.bsc.langgraph4j.state.AppenderChannel;
 import org.bsc.langgraph4j.state.Channel;
 import org.bsc.langgraph4j.webtest.visual.Operation;
+import org.bsc.langgraph4j.webtest.visual.OperationStep;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +52,10 @@ public class WebTestState extends AgentState {
 
     public Optional<String> error() {
         return value("error");
+    }
+
+    public Optional<List<OperationStep>> steps() {
+        return value("steps");
     }
 
     public Optional<Operation> operation() {
